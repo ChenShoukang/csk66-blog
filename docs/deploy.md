@@ -1,40 +1,44 @@
 # 部署说明
 
-站点是纯静态的（`npm run build` 生成 `dist/`），当前部署在 **腾讯云 EdgeOne Pages**：
+站点是纯静态的（`npm run build` 生成 `dist/`），部署在 **腾讯云 EdgeOne Pages**：
 
 - 项目：`001`（Project ID `makers-e7butzobsbjv`，直传类型）
 - 生产域名：**https://csk66.ink**（阿里云解析 CNAME → `csk66.ink.pages.dnsoe5.com`）
 - 部署地址：https://001-jzkmfopa.edgeone.dev
 
-## 一、日常部署（CLI 直传，当前方式）
+## 一、自动部署（当前方式，推荐）
 
-```bash
-# 第一次（本机已登录过可跳过）
-npm i -g edgeone
-edgeone login -s china
+推送到 `main` 就会自动构建并发布，不需要手动操作：
 
-# 每次发布
+- 工作流：`.github/workflows/deploy.yml`
+- 触发：`push` 到 `main`，或在 GitHub Actions 页面手动 **Run workflow**
+- 步骤：`npm ci` → `npm run build` → `npx edgeone makers deploy dist -n 001 -e production`
+- 认证：仓库 Secret **`EDGEONE_PAGES_API_TOKEN`**（EdgeOne API Token，只存在 GitHub Secrets 里，不落本地）
+
+> 部署完成后约 10~30 秒生效；GitHub 仓库的 **Actions** 页可以看每次日志。
+
+## 二、手动部署（CLI，备用）
+
+EdgeOne CLI 装在 **D 盘**（不占 C 盘）：`D:\aiwork\tools\node_modules\.bin\edgeone.cmd`
+
+```powershell
+# 首次登录（凭据会存到当前目录的 .edgeone\，不会写到 C 盘）
+D:\aiwork\tools\node_modules\.bin\edgeone.cmd login --site china --local
+
+# 发布
 npm run build
-edgeone makers deploy dist -n 001 -e production
+D:\aiwork\tools\node_modules\.bin\edgeone.cmd makers deploy dist -n 001 -e production
 ```
 
-说明：
+也可以不登录，直接带 API Token：
 
-- 项目 `001` 是「直传类型」，`-n 001` 会更新到已有项目，不会新建
-- 部署完成后约 10~30 秒生效，控制台「构建部署」里能看到记录
-- 登录信息存在本机 `~/.edgeone`；换机器需要重新 `edgeone login -s china`
-- CI / 非交互环境可以用 API Token：`edgeone makers deploy dist -n 001 -t <API Token>`（EdgeOne 控制台里生成）
-
-## 二、想改成 Git 自动部署（可选）
-
-当前项目 `001` 是直传类型，EdgeOne 的「Git 管理」需要新建 Git 项目再迁域名。两条路：
-
-1. **EdgeOne Git 项目**：控制台新建 Pages 项目 → 导入 GitHub `ChenShoukang/csk66-blog`（构建命令 `npm run build`，输出 `dist`，Node 22+）→ 部署成功后，在「域名管理」把 `csk66.ink` 从 001 解绑、绑到新项目
-2. **GitHub Actions + API Token**：仓库 Secrets 加 `EDGEONE_PAGES_API_TOKEN`，push 时执行 `edgeone makers deploy dist -n 001 -t $TOKEN`（不用迁项目，改动最小）
+```powershell
+D:\aiwork\tools\node_modules\.bin\edgeone.cmd makers deploy dist -n 001 -e production -t "<EdgeOne API Token>"
+```
 
 ## 三、DNS（阿里云）
 
-域名在阿里云买的，解析也还在阿里云（`dns31/dns32.hichina.com`），**不用改 NS**：
+域名在阿里云买的，解析还在阿里云（`dns31/dns32.hichina.com`），**不用改 NS**：
 
 | 主机记录 | 类型 | 记录值 |
 | --- | --- | --- |
@@ -51,7 +55,7 @@ EdgeOne 会自动签发 HTTPS 证书；备案按控制台要求处理（`.ink` �
 
 ## 五、手动上传
 
-```bash
+```powershell
 npm run build
 ```
 
