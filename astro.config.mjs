@@ -2,10 +2,10 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 // 部署时可以用环境变量覆盖站点地址：Vercel 里加一条 SITE_URL 即可
-const site = process.env.SITE_URL || 'https://csk66.example.com';
+const site = process.env.SITE_URL || 'https://csk66.ink';
 
 export default defineConfig({
-  // 部署后改成你自己的域名，或设置 SITE_URL 环境变量
+  // 站点域名（也可以用 SITE_URL 环境变量覆盖）
   site,
   integrations: [sitemap()],
   // 悬停时预取站内链接，翻页更快
