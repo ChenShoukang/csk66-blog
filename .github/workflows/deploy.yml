@@ -29,7 +29,15 @@ jobs:
         run: npm run build
 
       - name: Deploy to EdgeOne Pages
-        run: npx --yes edgeone@1.6.47 makers deploy dist -n 001 -e production -t "$EDGEONE_API_TOKEN"
         env:
           EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_PAGES_API_TOKEN }}
           EDGEONE_PAGES_API_REGION: china
+        run: |
+          for i in 1 2 3; do
+            echo "Deploy attempt $i..."
+            npx --yes edgeone@1.6.47 makers deploy dist -n 001 -e production -t "$EDGEONE_API_TOKEN" && exit 0
+            echo "Attempt $i failed, retrying in 15s..."
+            sleep 15
+          done
+          echo "Deploy failed after 3 attempts"
+          exit 1
