@@ -32,3 +32,4 @@ jobs:
         run: npx --yes edgeone@1.6.47 makers deploy dist -n 001 -e production -t "$EDGEONE_API_TOKEN"
         env:
           EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_PAGES_API_TOKEN }}
+          EDGEONE_PAGES_API_REGION: china
