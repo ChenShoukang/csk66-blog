@@ -62,20 +62,12 @@ npm run dev
 
 ## 部署
 
-代码在 GitHub：<https://github.com/ChenShoukang/csk66-blog>
+站点是纯静态的，代码在 GitHub：<https://github.com/ChenShoukang/csk66-blog>
 
-### Vercel（推荐）
+当前 **csk66.ink 指向腾讯云 EdgeOne Pages**，完整步骤（含 DNS、备案、Vercel / 手动上传备选）见 [docs/deploy.md](docs/deploy.md)。简单说：
 
-1. 打开 [vercel.com](https://vercel.com) → New Project → Import Git Repository，选 `csk66-blog`
-2. 框架会自动识别为 Astro（Build Command `npm run build`，Output Directory `dist`），直接 Deploy
-3. 在项目 Settings → Environment Variables 里加 `SITE_URL = https://csk66.ink`，再 Redeploy，sitemap / 分享卡片就会用真实域名
+1. EdgeOne 控制台 → Pages → 新建项目 / 打开已有项目 → 关联 Git 仓库 `ChenShoukang/csk66-blog`
+2. 构建设置：命令 `npm run build`，输出目录 `dist`，Node 版本 24
+3. 绑定域名 `csk66.ink`（阿里云解析保持 CNAME → `csk66.ink.pages.dnsoe5.com`）
 
-之后每次 push 到 `main`，Vercel 都会自动重新部署。
-
-### 手动部署
-
-```bash
-npm run build
-```
-
-生成的 `dist/` 文件夹就是整个网站，也可以直接上传到任意静态服务器。
+之后每次 push 到 `main` 都会自动部署。
