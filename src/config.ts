@@ -10,7 +10,7 @@ export const SITE = {
   taglines: ['Hello, welcome to csk66.', 'Write code. Write life.', 'Stay curious.'],
   // 页脚的 "正在…" 状态，例如 '正在听 — Abbey Road'
   now: '',
-  github: '', // 例如 'https://github.com/你的用户名'
+  github: 'https://github.com/ChenShoukang/csk66-blog', // 留空则不显示
   email: '',
   postsPerHome: 5,
 };

@@ -62,9 +62,20 @@ npm run dev
 
 ## 部署
 
+代码在 GitHub：<https://github.com/ChenShoukang/csk66-blog>
+
+### Vercel（推荐）
+
+1. 打开 [vercel.com](https://vercel.com) → New Project → Import Git Repository，选 `csk66-blog`
+2. 框架会自动识别为 Astro（Build Command `npm run build`，Output Directory `dist`），直接 Deploy
+3. 在项目 Settings → Environment Variables 里加 `SITE_URL = https://你的域名`，再 Redeploy，sitemap / 分享卡片就会用真实域名
+
+之后每次 push 到 `main`，Vercel 都会自动重新部署。
+
+### 手动部署
+
 ```bash
 npm run build
 ```
 
-生成的 `dist/` 文件夹就是整个网站，可以直接上传到 Vercel、Netlify、Cloudflare Pages 或 GitHub Pages。
-部署前记得把 `astro.config.mjs` 里的 `site` 改成你自己的域名。
+生成的 `dist/` 文件夹就是整个网站，也可以直接上传到任意静态服务器。
