@@ -14,6 +14,8 @@
 - 触发：`push` 到 `main`，或在 GitHub Actions 页面手动 **Run workflow**
 - 步骤：`npm ci` → `npm run build` → `npx edgeone makers deploy dist -n 001 -e production`
 - 认证：仓库 Secret **`EDGEONE_PAGES_API_TOKEN`**（EdgeOne API Token，只存在 GitHub Secrets 里，不落本地）
+- 环境变量：`EDGEONE_PAGES_API_REGION=china`（不指定时 CLI 会自动探测区域，CI 里容易探测错导致 token 被判无效）
+- 部署命令带 3 次重试，EdgeOne API 偶发 5xx/522 时会自动重试
 
 > 部署完成后约 10~30 秒生效；GitHub 仓库的 **Actions** 页可以看每次日志。
 
