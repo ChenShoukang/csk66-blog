@@ -64,10 +64,11 @@ npm run dev
 
 站点是纯静态的，代码在 GitHub：<https://github.com/ChenShoukang/csk66-blog>
 
-当前 **csk66.ink 指向腾讯云 EdgeOne Pages**，完整步骤（含 DNS、备案、Vercel / 手动上传备选）见 [docs/deploy.md](docs/deploy.md)。简单说：
+当前部署在**腾讯云 EdgeOne Pages** 项目 `001`，域名 **https://csk66.ink**。日常发布：
 
-1. EdgeOne 控制台 → Pages → 新建项目 / 打开已有项目 → 关联 Git 仓库 `ChenShoukang/csk66-blog`
-2. 构建设置：命令 `npm run build`，输出目录 `dist`，Node 版本 24
-3. 绑定域名 `csk66.ink`（阿里云解析保持 CNAME → `csk66.ink.pages.dnsoe5.com`）
+```bash
+npm run build
+edgeone makers deploy dist -n 001 -e production   # 首次需 npm i -g edgeone && edgeone login -s china
+```
 
-之后每次 push 到 `main` 都会自动部署。
+DNS、Git 自动部署、Vercel / 手动上传等完整说明见 [docs/deploy.md](docs/deploy.md)。
