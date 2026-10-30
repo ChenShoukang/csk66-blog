@@ -1,0 +1,204 @@
+<div class="search" id="search" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="panel" role="dialog" aria-label="Search">
+    <div class="bar">
+      <span class="prompt mono">&gt;</span>
+      <input id="search-input" type="text" placeholder="搜索文章、标签…" autocomplete="off" spellcheck="false" />
+      <kbd class="mono" data-close>esc</kbd>
+    </div>
+    <ul id="search-results" class="results"></ul>
+    <div class="hint mono">↑↓ 选择 · ↵ 打开 · esc 关闭</div>
+  </div>
+</div>
+
+<style>
+  .search {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 12vh 16px 0;
+  }
+
+  .search[hidden] {
+    display: none;
+  }
+
+  .backdrop {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--paper) 60%, transparent);
+    backdrop-filter: blur(6px);
+    animation: fade 0.2s;
+  }
+
+  .panel {
+    position: relative;
+    width: 100%;
+    max-width: 620px;
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    background: var(--card);
+    box-shadow: 8px 8px 0 var(--shadow-c);
+    overflow: hidden;
+    animation: pop 0.25s cubic-bezier(0.2, 1.4, 0.4, 1);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1.5px dashed var(--line);
+  }
+
+  .prompt {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .bar input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: none;
+    color: var(--ink);
+    font: 500 18px var(--font-body);
+  }
+
+  .bar kbd {
+    font-size: 12px;
+    padding: 2px 7px;
+    border: 1.5px solid var(--line);
+    border-radius: 6px;
+    color: var(--muted);
+  }
+
+  .results {
+    list-style: none;
+    margin: 0;
+    padding: 6px;
+    max-height: 52vh;
+    overflow-y: auto;
+  }
+
+  .results :global(li a) {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+  }
+
+  .results :global(li.sel a) {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .results :global(.t) {
+    font-weight: 600;
+  }
+
+  .results :global(.k) {
+    font: 12px var(--font-mono);
+    opacity: 0.65;
+    white-space: nowrap;
+  }
+
+  .results :global(.empty) {
+    padding: 22px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .hint {
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1.5px dashed var(--line);
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(-8px);
+    }
+  }
+</style>
+
+<script>
+  type Item = { title: string; url: string; type: string; tags: string[]; summary: string; date: string };
+
+  const root = document.getElementById('search')!;
+  const input = document.getElementById('search-input') as HTMLInputElement;
+  const list = document.getElementById('search-results')!;
+  let items: Item[] | null = null;
+  let shown: Item[] = [];
+  let sel = 0;
+
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&${{ '&': 'amp', '<': 'lt', '>': 'gt', '"': 'quot' }[c]};`);
+
+  async function open() {
+    root.hidden = false;
+    input.value = '';
+    input.focus();
+    items ??= await fetch('/search.json').then((r) => r.json());
+    render();
+  }
+
+  function close() {
+    root.hidden = true;
+  }
+
+  function render() {
+    const q = input.value.trim().toLowerCase();
+    const terms = q.split(/\s+/).filter(Boolean);
+    shown = (items || [])
+      .filter((it) => {
+        const hay = `${it.title} ${it.summary} ${it.tags.join(' ')}`.toLowerCase();
+        return terms.every((t) => hay.includes(t));
+      })
+      .slice(0, 12);
+    sel = 0;
+    list.innerHTML = shown.length
+      ? shown
+          .map(
+            (it, i) =>
+              `<li class="${i === sel ? 'sel' : ''}"><a href="${it.url}"><span class="t">${esc(it.title)}</span><span class="k">${it.type} · ${it.date}</span></a></li>`,
+          )
+          .join('')
+      : `<li class="empty">${!items?.length ? '还没有可以搜索的内容' : q ? `没有找到 “${esc(q)}”` : '输入关键词开始搜索'}</li>`;
+  }
+
+  function move(d: number) {
+    if (!shown.length) return;
+    sel = (sel + d + shown.length) % shown.length;
+    list.querySelectorAll('li').forEach((li, i) => li.classList.toggle('sel', i === sel));
+    list.children[sel]?.scrollIntoView({ block: 'nearest' });
+  }
+
+  input.addEventListener('input', render);
+  root.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', close));
+  document.getElementById('search-open')!.addEventListener('click', open);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      root.hidden ? open() : close();
+      return;
+    }
+    if (root.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowDown') (e.preventDefault(), move(1));
+    else if (e.key === 'ArrowUp') (e.preventDefault(), move(-1));
+    else if (e.key === 'Enter' && shown[sel]) location.href = shown[sel].url;
+  });
+</script>

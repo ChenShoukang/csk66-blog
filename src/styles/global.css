@@ -1,0 +1,410 @@
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource-variable/jetbrains-mono';
+
+/* ============ 设计令牌 ============ */
+:root {
+  --paper: #f4efe6;
+  --paper-2: #ebe4d6;
+  --card: #fffaf1;
+  --ink: #1c1a17;
+  --ink-2: #4a463f;
+  --muted: #8a8378;
+  --line: #d9d0c0;
+  --accent: #2f6bff;
+  --accent-soft: #d6e2ff;
+  --accent-ink: #1c1a17;
+  --glass: rgba(255, 250, 241, 0.55);
+  --border: var(--ink);
+  --shadow-c: var(--ink);
+  --shadow-hover: var(--accent);
+  --shadow: 6px 6px 0 var(--shadow-c);
+
+  --font-display: 'Space Grotesk Variable', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-body: 'Space Grotesk Variable', -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, Consolas, monospace;
+
+  --wrap: 1080px;
+  --radius: 14px;
+  color-scheme: light;
+}
+
+:root.dark {
+  --paper: #000;
+  --paper-2: #0b0b0e;
+  --card: rgba(12, 12, 16, 0.85);
+  --ink: #e9e7f2;
+  --ink-2: #b7b5c9;
+  --muted: #6e6c84;
+  --line: #262a3d;
+  --accent: #6ea8ff;
+  --accent-soft: #172a52;
+  --accent-ink: #000;
+  --glass: rgba(0, 0, 0, 0.55);
+  /* 夜空下不用刺眼的白边，改成半透明描边 + 淡蓝色投影 */
+  --border: rgba(233, 231, 242, 0.16);
+  --shadow-c: rgba(110, 168, 255, 0.16);
+  --shadow-hover: rgba(110, 168, 255, 0.45);
+  --shadow: 6px 6px 0 var(--shadow-c);
+  color-scheme: dark;
+}
+
+/* ============ 基础 ============ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+}
+
+body {
+  margin: 0;
+  overflow-x: clip;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* 纸张颗粒感 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+:root.dark body::before {
+  display: none;
+}
+
+:root.dark .site-footer {
+  background: #000;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+main {
+  flex: 1;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* 荧光笔划过效果 —— 全站链接的统一 hover */
+.hl {
+  background-image: linear-gradient(var(--accent-soft), var(--accent-soft));
+  background-repeat: no-repeat;
+  background-position: 0 88%;
+  background-size: 0 40%;
+  transition: background-size 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+a:hover .hl,
+.hl:hover,
+button:hover .hl {
+  background-size: 100% 40%;
+}
+
+/* ============ 页面头部 ============ */
+.page-head {
+  padding: 64px 0 28px;
+  border-bottom: 1.5px dashed var(--line);
+  margin-bottom: 40px;
+}
+
+.page-head .kicker {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+
+.page-head h1 {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 7vw, 68px);
+  line-height: 1.05;
+  margin: 8px 0 14px;
+  letter-spacing: -0.03em;
+}
+
+.page-head p {
+  color: var(--ink-2);
+  margin: 0;
+  max-width: 640px;
+}
+
+/* ============ 标签 ============ */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 1px 9px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  color: var(--ink);
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.tag:hover {
+  background: var(--ink);
+  color: var(--paper);
+  transform: translateY(-1px);
+}
+
+.tag small {
+  margin-left: 6px;
+  color: var(--accent);
+}
+
+/* ============ 按钮 ============ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 15px var(--font-mono);
+  padding: 10px 18px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 4px 4px 0 var(--shadow-c);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--shadow-c);
+}
+
+/* ============ 文章正文 ============ */
+.prose {
+  font-size: 17.5px;
+  line-height: 1.85;
+  color: var(--ink);
+  overflow-wrap: break-word;
+}
+
+.prose > * + * {
+  margin-top: 1.1em;
+}
+
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--font-display);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 110px;
+}
+
+.prose h2 {
+  font-size: 1.6em;
+  margin-top: 2em;
+  padding-bottom: 6px;
+  border-bottom: 1.5px dashed var(--line);
+}
+
+.prose h2::before {
+  content: '#';
+  color: var(--accent);
+  margin-right: 10px;
+  font-family: var(--font-mono);
+}
+
+.prose h3 {
+  font-size: 1.28em;
+  margin-top: 1.6em;
+}
+
+.prose a {
+  color: var(--ink);
+  border-bottom: 2px solid var(--accent);
+  transition: background 0.2s;
+}
+
+.prose a:hover {
+  background: var(--accent-soft);
+}
+
+.prose strong {
+  font-weight: 700;
+  background: linear-gradient(transparent 62%, var(--accent-soft) 62%);
+}
+
+.prose blockquote {
+  margin-left: 0;
+  margin-right: 0;
+  padding: 10px 20px;
+  border-left: 4px solid var(--accent);
+  background: var(--paper-2);
+  border-radius: 0 10px 10px 0;
+  color: var(--ink-2);
+}
+
+.prose :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+}
+
+.prose pre {
+  font-family: var(--font-mono);
+  font-size: 14.5px;
+  line-height: 1.65;
+  padding: 18px 20px;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  box-shadow: 5px 5px 0 var(--line);
+  overflow-x: auto;
+}
+
+.prose pre code {
+  font-family: inherit;
+}
+
+/* shiki 双主题 */
+.astro-code,
+.astro-code span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+:root.dark .astro-code,
+:root.dark .astro-code span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+.prose img {
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  margin: 1.6em auto;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.prose th,
+.prose td {
+  border: 1.5px solid var(--line);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.prose th {
+  background: var(--paper-2);
+}
+
+.prose hr {
+  border: none;
+  text-align: center;
+  margin: 2.4em 0;
+}
+
+.prose hr::after {
+  content: '✦ ✦ ✦';
+  color: var(--accent);
+  letter-spacing: 0.6em;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.4em;
+}
+
+.prose li::marker {
+  color: var(--accent);
+}
+
+/* ============ 进场动画 ============ */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============ 空状态 ============ */
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 56px 24px;
+  text-align: center;
+  color: var(--muted);
+  border: 2px dashed var(--line);
+  border-radius: var(--radius);
+}
+
+.empty-state span {
+  font-size: 28px;
+  color: var(--accent);
+}
+
+.empty-state p {
+  margin: 10px 0 0;
+}

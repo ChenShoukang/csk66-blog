@@ -1,0 +1,120 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Search from '../components/Search.astro';
+import Cursor from '../components/Cursor.astro';
+import Sky from '../components/Sky.astro';
+import { SITE } from '../config';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
+}
+
+const { title, description = SITE.description, image, noindex = false } = Astro.props;
+const isPost = Astro.url.pathname.startsWith('/posts/');
+const type = Astro.props.type ?? (isPost ? 'article' : 'website');
+const fullTitle = title ? `${title} · ${SITE.name}` : `${SITE.title} — ${SITE.description}`;
+const site = Astro.site ?? new URL('https://csk66.example.com');
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL(image ?? '/og-image.png', site).href;
+const rssUrl = new URL('/rss.xml', site).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': type === 'article' ? 'BlogPosting' : 'WebSite',
+  name: fullTitle,
+  url: canonical,
+  description,
+  image: ogImage,
+  inLanguage: 'zh-CN',
+  author: { '@type': 'Person', name: SITE.author },
+};
+---
+
+<!doctype html>
+<html lang="zh-CN" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={SITE.author} />
+    <meta name="robots" content={noindex ? 'noindex, nofollow' : 'max-image-preview:large'} />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f4efe6" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={canonical} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title={SITE.title} href={rssUrl} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="zh_CN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="generator" content={Astro.generator} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+    <script is:inline>
+      // 尽早应用主题，避免闪烁
+      (() => {
+        const saved = localStorage.getItem('theme');
+        const dark = saved ? saved === 'dark' : true; // 默认深色夜空
+        document.documentElement.classList.toggle('dark', dark);
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">跳到主要内容</a>
+    <Sky />
+    <Cursor />
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <Search />
+    <script>
+      // 滚动进场
+      const io = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io.unobserve(e.target);
+            }
+          }),
+        { rootMargin: '0px 0px -8% 0px' },
+      );
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  .skip {
+    position: absolute;
+    left: 12px;
+    top: -80px;
+    z-index: 9999;
+    padding: 10px 16px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--ink);
+    font: 600 14px var(--font-mono);
+    transition: top 0.15s;
+  }
+
+  .skip:focus {
+    top: 12px;
+  }
+</style>

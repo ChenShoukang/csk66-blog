@@ -1,0 +1,57 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import PostCard from '../components/PostCard.astro';
+import { SITE } from '../config';
+import { getPosts } from '../utils';
+
+const posts = (await getPosts()).slice(0, SITE.postsPerHome);
+---
+
+<Base>
+  <Hero />
+
+  <section id="latest" class="wrap latest">
+    <div class="head reveal">
+      <h2>
+        最新文章
+      </h2>
+      <a href="/blog" class="all mono"><span class="hl">查看全部</span> →</a>
+    </div>
+
+    <div class="pane" data-pane="posts">
+      {posts.length ? posts.map((p, i) => <PostCard post={p} index={i} />) : <div class="empty-state mono"><span>¯\_(ツ)_/¯</span><p>还没有文章，第一篇正在路上…</p></div>}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .latest {
+    padding-top: 40px;
+  }
+
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    margin-bottom: 48px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  h2 {
+    margin: 0;
+    font: 700 clamp(30px, 5vw, 44px) var(--font-display);
+    letter-spacing: -0.03em;
+  }
+
+  .all {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .pane {
+    display: grid;
+    gap: 72px;
+  }
+</style>

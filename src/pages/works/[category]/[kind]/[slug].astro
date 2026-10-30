@@ -1,0 +1,151 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import { findCategory } from '../../../../data/works';
+import { formatDate } from '../../../../utils';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('works', ({ data }) => import.meta.env.DEV || !data.draft);
+  return entries.map((entry) => {
+    const [category, kind, slug] = entry.id.split('/');
+    return { params: { category, kind, slug }, props: { entry } };
+  });
+}
+
+const { entry } = Astro.props;
+const [category, kind] = entry.id.split('/');
+const cat = findCategory(category)!;
+const kindMeta = cat.kinds.find((k) => k.slug === kind)!;
+const { Content } = await render(entry);
+const { title, date, summary, tags, author, year, rating, link, cover, video, poster } = entry.data;
+---
+
+<Base title={title} description={summary ?? `${cat.name} · ${kindMeta.name}`}>
+  <div class="wrap">
+    <div class="topbar">
+      <a class="btn back" href={`/works/${cat.slug}/`}>← 返回{cat.name}</a>
+      <a class="btn sub" href="/works/">作品总览</a>
+    </div>
+
+    <header class="page-head">
+      <div class="kicker">// {cat.name} · {kindMeta.name}</div>
+      <h1>{title}</h1>
+      <p class="info mono">
+        <span>{formatDate(date, true)}</span>
+        {author && <span>· {author}</span>}
+        {year && <span>· {year}</span>}
+        {rating ? <span>· ★ {rating}</span> : null}
+      </p>
+      {
+        tags.length > 0 && (
+          <div class="tags">
+            {tags.map((t) => (
+              <span class="tag">#{t}</span>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    {
+      video && (
+        <div class="video">
+          <video src={video} poster={poster} controls preload="metadata" playsinline></video>
+        </div>
+      )
+    }
+
+    <article class="prose">
+      {cover && <img class="cover" src={cover} alt="" />}
+      <Content />
+    </article>
+
+    {
+      link && (
+        <p class="ext">
+          <a class="btn" href={link} target="_blank" rel="noreferrer">
+            查看原文 ↗
+          </a>
+        </p>
+      )
+    }
+
+    <div class="bottom">
+      <a class="btn" href={`/works/${cat.slug}/`}>← 返回{cat.name}</a>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .topbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 44px;
+  }
+
+  .topbar .back,
+  .bottom .btn {
+    padding: 9px 16px;
+    font-size: 14px;
+  }
+
+  .topbar .sub {
+    padding: 9px 14px;
+    font-size: 14px;
+    border-color: var(--line);
+    box-shadow: none;
+    color: var(--ink-2);
+  }
+
+  .info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--accent);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .video {
+    max-width: 900px;
+    margin: 0 0 44px;
+  }
+
+  .video video {
+    display: block;
+    width: 100%;
+    background: #000;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .prose {
+    max-width: 820px;
+  }
+
+  .cover {
+    width: 100%;
+    margin-bottom: 1.6em;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .ext {
+    margin: 44px 0 0;
+  }
+
+  .bottom {
+    margin-top: 64px;
+    padding-bottom: 8px;
+  }
+</style>

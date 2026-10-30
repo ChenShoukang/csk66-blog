@@ -1,0 +1,201 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { WORK_CATEGORIES, findCategory } from '../../../data/works';
+import { formatDate } from '../../../utils';
+import { getCollection } from 'astro:content';
+
+export function getStaticPaths() {
+  return WORK_CATEGORIES.map((category) => ({ params: { category: category.slug } }));
+}
+
+const cat = findCategory(Astro.params.category!)!;
+const entries = (await getCollection('works', ({ data }) => import.meta.env.DEV || !data.draft))
+  .filter((e) => e.id.split('/')[0] === cat.slug)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const kindEntries = (slug: string) => entries.filter((e) => e.id.split('/')[1] === slug);
+---
+
+<Base title={cat.name}>
+  <div class="wrap">
+    <header class="page-head">
+      <a class="btn back" href="/works/">← 作品总览</a>
+      <div class="kicker">// {cat.name} · {entries.length}</div>
+      <h1>{cat.name}<span style="color:var(--accent)">.</span></h1>
+    </header>
+
+    <nav class="tabs mono" aria-label="栏目">
+      {
+        cat.kinds.map((k) => (
+          <a href={`#${k.slug}`}>
+            {k.name}
+          </a>
+        ))
+      }
+    </nav>
+
+    {
+      cat.kinds.map((kind) => {
+        const items = kindEntries(kind.slug);
+        return (
+          <section class="kind" id={kind.slug}>
+            <div class="kind-head">
+              <h2>{kind.name}</h2>
+              <span class="count mono">{items.length} {kind.unit ?? cat.unit}</span>
+            </div>
+            <p class="kind-desc">{kind.desc}</p>
+            {items.length === 0 ? (
+              <p class="empty mono">还没有内容，慢慢补上。</p>
+            ) : (
+              <div class="cards">
+                {items.map((e) => {
+                  const slug = e.id.split('/')[2];
+                  return (
+                    <a class="card reveal" href={`/works/${cat.slug}/${kind.slug}/${slug}/`}>
+                      <div class="meta mono">
+                        <span>{formatDate(e.data.date)}</span>
+                        {e.data.author && <span>{e.data.author}</span>}
+                        {e.data.rating ? <span>★ {e.data.rating}</span> : null}
+                      </div>
+                      <h3>{e.data.title}</h3>
+                      {e.data.summary && <p>{e.data.summary}</p>}
+                      {e.data.tags.length > 0 && (
+                        <div class="tags">
+                          {e.data.tags.map((t) => (
+                            <span class="tag">{t}</span>
+                          ))}
+                        </div>
+                      )}
+                    </a>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        );
+      })
+    }
+  </div>
+</Base>
+
+<style>
+  .back {
+    display: inline-flex;
+    margin-bottom: 22px;
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tabs a {
+    padding: 4px 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--ink-2);
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+
+  .tabs a:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .kind {
+    padding: 40px 0;
+    border-bottom: 1.5px dashed var(--line);
+    scroll-margin-top: 100px;
+  }
+
+  .kind:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .kind-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  h2 {
+    margin: 0;
+    font: 700 clamp(26px, 3vw, 34px) / 1.2 var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  .count {
+    font-size: 12.5px;
+    color: var(--accent);
+  }
+
+  .kind-desc {
+    margin: 6px 0 22px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .empty {
+    margin: 0;
+    padding: 18px 20px;
+    color: var(--muted);
+    font-size: 14px;
+    border: 1.5px dashed var(--line);
+    border-radius: var(--radius);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: 4px 4px 0 var(--shadow-c);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 var(--shadow-hover);
+  }
+
+  .card .meta {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  h3 {
+    margin: 0;
+    font: 700 20px / 1.3 var(--font-display);
+  }
+
+  .card p {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 14.5px;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 6px;
+  }
+</style>

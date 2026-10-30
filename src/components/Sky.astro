@@ -1,0 +1,156 @@
+<!-- 夜空背景：纯黑底 + 稀疏的星星 + 偶尔划过的流星（仅深色模式显示） -->
+<div class="sky" aria-hidden="true">
+  <canvas id="sky-canvas"></canvas>
+</div>
+
+<style>
+  .sky {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    display: none;
+  }
+
+  :global(:root.dark) .sky {
+    display: block;
+  }
+
+  canvas {
+    position: absolute;
+    inset: 0;
+  }
+</style>
+
+<script>
+  const canvas = document.getElementById('sky-canvas') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d')!;
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+
+  type Star = { x: number; y: number; r: number; depth: number; phase: number; speed: number; tint: string };
+  type Meteor = { x: number; y: number; vx: number; vy: number; life: number };
+  let stars: Star[] = [];
+  let meteors: Meteor[] = [];
+  let W = 0, H = 0;
+  let nextMeteor = performance.now() + 2500;
+  let raf = 0;
+
+  const TINTS = ['255,255,255', '235,240,255', '200,220,255', '255,244,235'];
+  const isDark = () => document.documentElement.classList.contains('dark');
+
+  function build() {
+    W = innerWidth;
+    H = innerHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.round((W * H) / 8000);
+    stars = Array.from({ length: n }, () => {
+      const depth = Math.random();
+      return {
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: 0.25 + depth * depth * 1.4,
+        depth,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.6 + Math.random() * 2,
+        tint: TINTS[(Math.random() * TINTS.length) | 0],
+      };
+    });
+  }
+
+  function paint(now: number) {
+    ctx.clearRect(0, 0, W, H);
+    const t = now / 1000;
+    const sy = scrollY;
+
+    for (const s of stars) {
+      // 越近的星星视差越大，滚动时有纵深感
+      // 整片星空缓慢漂移（越近越快），滚动时再叠加一点视差
+      const x = (((s.x - (calm ? 0 : t) * (2 + s.depth * 7)) % W) + W) % W;
+      const y = (((s.y - (calm ? 0 : t) * (0.6 + s.depth * 2) - sy * s.depth * 0.15) % H) + H) % H;
+      const tw = calm ? 0.8 : 0.55 + 0.45 * Math.sin(t * s.speed + s.phase);
+      ctx.globalAlpha = tw * (0.35 + s.depth * 0.65);
+      ctx.fillStyle = `rgb(${s.tint})`;
+      ctx.beginPath();
+      ctx.arc(x, y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+      // 最亮的几颗加一点十字光芒
+      if (s.r > 1.35 && tw > 0.85) {
+        ctx.globalAlpha = (tw - 0.85) * 3;
+        ctx.fillRect(x - s.r * 4, y - 0.4, s.r * 8, 0.8);
+        ctx.fillRect(x - 0.4, y - s.r * 4, 0.8, s.r * 8);
+      }
+    }
+
+    if (!calm) {
+      if (now > nextMeteor && meteors.length === 0) {
+        nextMeteor = now + 4000 + Math.random() * 7000;
+        const fromLeft = Math.random() < 0.5;
+        meteors.push({
+          x: fromLeft ? Math.random() * W * 0.5 : W * 0.5 + Math.random() * W * 0.5,
+          y: Math.random() * H * 0.35,
+          vx: (fromLeft ? 1 : -1) * (7 + Math.random() * 4),
+          vy: 3 + Math.random() * 2,
+          life: 1,
+        });
+      }
+      for (let i = meteors.length - 1; i >= 0; i--) {
+        const m = meteors[i];
+        m.x += m.vx;
+        m.y += m.vy;
+        m.life -= 0.012;
+        if (m.life <= 0) {
+          meteors.splice(i, 1);
+          continue;
+        }
+        const tail = 14;
+        const g = ctx.createLinearGradient(m.x, m.y, m.x - m.vx * tail, m.y - m.vy * tail);
+        g.addColorStop(0, `rgba(220,235,255,${m.life})`);
+        g.addColorStop(1, 'rgba(220,235,255,0)');
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(m.x, m.y);
+        ctx.lineTo(m.x - m.vx * tail, m.y - m.vy * tail);
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function loop(now: number) {
+    raf = 0;
+    // 切到浅色主题或标签页不可见时停下，不用一直空转
+    if (document.hidden || !isDark()) return;
+    paint(now);
+    raf = requestAnimationFrame(loop);
+  }
+
+  function start() {
+    if (raf || document.hidden || !isDark()) return;
+    if (calm) {
+      // 系统开了「减少动态效果」：只画一帧静止星空
+      paint(performance.now());
+      return;
+    }
+    raf = requestAnimationFrame(loop);
+  }
+
+  build();
+  let rt: number;
+  addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => {
+      build();
+      start();
+    }, 200);
+  });
+  new MutationObserver(start).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  document.addEventListener('visibilitychange', start);
+  start();
+</script>

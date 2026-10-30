@@ -1,0 +1,504 @@
+---
+import { SITE } from '../config';
+---
+
+<section class="hero">
+  <div class="glow" aria-hidden="true"></div>
+
+  <div class="title-wrap">
+    <h1 class="title" id="hero-title">CSK66</h1>
+    <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  </div>
+
+  <p class="type mono">
+    <span class="caret-prompt">~/csk66 $</span>
+    <span id="typer"></span><span class="caret"></span>
+    <canvas id="type-canvas" aria-hidden="true"></canvas>
+  </p>
+
+</section>
+
+<script define:vars={{ lines: SITE.taglines }}>
+  // 打字机：逐字打出 → 停顿 → 删除 → 下一句（画面由下方的粒子脚本根据这里的文字绘制）
+  const el = document.getElementById('typer');
+  let li = 0, ci = 0, del = false;
+  const step = () => {
+    const s = lines[li];
+    ci += del ? -1 : 1;
+    el.textContent = s.slice(0, ci);
+    let wait = del ? 28 : 70 + Math.random() * 60;
+    if (!del && ci === s.length) (del = true), (wait = 2200);
+    else if (del && ci === 0) (del = false), (li = (li + 1) % lines.length), (wait = 400);
+    setTimeout(step, wait);
+  };
+  setTimeout(step, 900);
+</script>
+
+<script>
+  // 粒子标题：文字采样成点阵
+  // - 颜色在几组和谐的双色渐变之间缓慢过渡
+  // - 每隔几秒自动"消散 → 聚合"一次
+  // - 鼠标靠近时把粒子推开
+  const title = document.getElementById('hero-title')!;
+  const canvas = document.getElementById('hero-canvas') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d')!;
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  type Dot = {
+    x: number; y: number; ox: number; oy: number; vx: number; vy: number;
+    sx: number; sy: number; delay: number;
+  };
+  let dots: Dot[] = [];
+  let mouse = { x: -9999, y: -9999 };
+  let w = 0, h = 0, pad = 0, dark = false;
+  let visible = true;
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+
+  // 时间线（毫秒）：聚合静止 HOLD → 散开 BURST → 漂浮 FLOAT → 回到原位
+  const HOLD = 5200, BURST = 900, FLOAT = 1100, CYCLE = HOLD + BURST + FLOAT + 1600;
+  const start = performance.now();
+
+  // 配色：每组是 [左, 右] 两个颜色
+  type RGB = [number, number, number];
+  const PALETTES: [RGB, RGB][] = [
+    [[214, 232, 255], [110, 160, 255]], // 冰川：冰白 → 天蓝
+    [[110, 220, 255], [70, 110, 245]], // 深海：浅青 → 深蓝
+    [[160, 150, 255], [90, 170, 255]], // 星夜：靛紫 → 湛蓝
+    [[130, 235, 235], [80, 140, 255]], // 极光：青色 → 钴蓝
+  ];
+  const STEP = 9000; // 每组停留 + 过渡的时长
+  const mix = (a: RGB, b: RGB, k: number): RGB => [0, 1, 2].map((i) => a[i] + (b[i] - a[i]) * k) as RGB;
+  const darken = (c: RGB, k: number): RGB => c.map((v) => v * k) as RGB;
+  const rgb = (c: RGB) => `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})`;
+  const ease = (x: number) => x * x * (3 - 2 * x);
+  function palette(t: number): [RGB, RGB] {
+    const i = Math.floor(t / STEP) % PALETTES.length;
+    const j = (i + 1) % PALETTES.length;
+    // 前 60% 时间停在当前配色，后 40% 平滑过渡到下一组
+    const k = ease(Math.max(0, ((t % STEP) / STEP - 0.6) / 0.4));
+    return [mix(PALETTES[i][0], PALETTES[j][0], k), mix(PALETTES[i][1], PALETTES[j][1], k)];
+  }
+
+  function colors() {
+    dark = document.documentElement.classList.contains('dark');
+  }
+
+  function scatterTarget(d: Dot) {
+    // 从文字中心向外炸开，带一点旋转和随机性
+    const cx = (w - pad * 2) / 2 + pad, cy = h / 2;
+    const ang = Math.atan2(d.oy - cy, d.ox - cx) + (Math.random() - 0.5) * 1.2;
+    const r = 60 + Math.random() * pad * 0.95;
+    d.sx = d.ox + Math.cos(ang) * r;
+    d.sy = d.oy + Math.sin(ang) * r * 0.7;
+  }
+
+  function build() {
+    const rect = title.getBoundingClientRect();
+    pad = Math.round(Math.min(220, rect.width * 0.3));
+    w = Math.ceil(rect.width + pad * 2);
+    h = Math.ceil(rect.height + pad * 2);
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // 离屏绘制文字再取样
+    const off = document.createElement('canvas');
+    off.width = w;
+    off.height = h;
+    const o = off.getContext('2d')!;
+    const cs = getComputedStyle(title);
+    o.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    o.letterSpacing = cs.letterSpacing;
+    o.textAlign = 'center';
+    o.textBaseline = 'middle';
+    o.fillText(title.textContent || '', w / 2, h / 2 + parseFloat(cs.fontSize) * 0.04);
+    const data = o.getImageData(0, 0, w, h).data;
+    const gap = rect.width < 500 ? 4 : 5;
+    const prev = dots;
+    dots = [];
+    for (let y = 0; y < h; y += gap)
+      for (let x = 0; x < w; x += gap)
+        if (data[(y * w + x) * 4 + 3] > 128) {
+          const old = prev[dots.length];
+          const d: Dot = {
+            x: old ? old.x : Math.random() * w,
+            y: old ? old.y : Math.random() * h,
+            ox: x, oy: y, vx: 0, vy: 0, sx: 0, sy: 0,
+            // 从左到右依次散开，形成一道波
+            delay: ((x - pad) / (w - pad * 2)) * 450 + Math.random() * 120,
+          };
+          scatterTarget(d);
+          dots.push(d);
+        }
+  }
+
+  // ===== Logo 下面那行字：同样用粒子绘制，颜色跟 Logo 同步 =====
+  const line = document.querySelector<HTMLElement>('.type')!;
+  const typer = document.getElementById('typer')!;
+  const promptEl = line.querySelector<HTMLElement>('.caret-prompt')!;
+  const tc = document.getElementById('type-canvas') as HTMLCanvasElement;
+  const tctx = tc.getContext('2d')!;
+  // sdx / sdy：跟着 Logo 一起散开时，相对原位的偏移
+  type TDot = { x: number; y: number; ox: number; oy: number; vx: number; vy: number; a: number; sdx: number; sdy: number };
+  const tScatter = (d: TDot) => {
+    const ang = Math.random() * Math.PI * 2;
+    const r = 14 + Math.random() * 70;
+    d.sdx = Math.cos(ang) * r;
+    d.sdy = Math.sin(ang) * r * 0.6;
+  };
+  let tdots: TDot[] = [];
+  let dying: TDot[] = [];
+  let tw = 0, th = 0, fs = 18, textL = 0, textR = 1, lastStr = '';
+  const TPAD = 28, TGAP = 2;
+  let cmx = -9999, cmy = -9999; // 鼠标的屏幕坐标
+
+  function buildLine(force = false) {
+    const str = `${promptEl.textContent} ${typer.textContent}`;
+    if (!force && str === lastStr) return;
+    lastStr = str;
+    const cs = getComputedStyle(line);
+    fs = parseFloat(cs.fontSize);
+    if (force) {
+      const r = line.getBoundingClientRect();
+      tw = Math.ceil(r.width + TPAD * 2);
+      th = Math.ceil(fs * 1.6 + TPAD * 2);
+      tc.width = tw * dpr;
+      tc.height = th * dpr;
+      tc.style.width = tw + 'px';
+      tc.style.height = th + 'px';
+      tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    const off = document.createElement('canvas');
+    off.width = tw;
+    off.height = th;
+    const o = off.getContext('2d')!;
+    o.font = `700 ${fs}px ${cs.fontFamily}`;
+    o.letterSpacing = cs.letterSpacing;
+    o.textBaseline = 'middle';
+    // 留出光标块的宽度，让文字 + 光标整体居中
+    const m = o.measureText(str).width;
+    textL = Math.round((tw - m - fs * 0.9) / 2);
+    textR = textL + m;
+    o.fillText(str, textL, th / 2);
+    const data = o.getImageData(0, 0, tw, th).data;
+
+    // 按列采样：打字只会在末尾增删粒子，前面的粒子保持不动
+    const targets: [number, number][] = [];
+    for (let x = 0; x < tw; x += TGAP)
+      for (let y = 0; y < th; y += TGAP) if (data[(y * tw + x) * 4 + 3] > 110) targets.push([x, y]);
+
+    const next: TDot[] = [];
+    targets.forEach(([x, y], i) => {
+      const d = tdots[i];
+      if (d) {
+        d.ox = x;
+        d.oy = y;
+        next.push(d);
+      } else {
+        // 新打出的字：粒子从附近飘过来聚合
+        const nd: TDot = { x: x + (Math.random() - 0.3) * 30, y: y + (Math.random() - 0.5) * 24, ox: x, oy: y, vx: 0, vy: 0, a: 0, sdx: 0, sdy: 0 };
+        tScatter(nd);
+        next.push(nd);
+      }
+    });
+    dying.push(...tdots.slice(targets.length));
+    tdots = next;
+  }
+
+  function drawLine(t: number, pal: [RGB, RGB], ct: number) {
+    buildLine();
+    const r = tc.getBoundingClientRect();
+    const mx = cmx - r.left, my = cmy - r.top;
+    tctx.clearRect(0, 0, tw, th);
+    const R = 22;
+    const span = Math.max(1, textR - textL);
+    const colorAt = (x: number) => {
+      const c = mix(pal[0], pal[1], Math.min(1, Math.max(0, (x - textL) / span)));
+      return rgb(dark ? c : darken(c, 0.62));
+    };
+    for (const d of tdots) {
+      // 和 Logo 同一条时间线：从左到右依次散开、漂浮、再聚合
+      const local = ct - HOLD - ((d.ox - textL) / span) * 450;
+      const out = local > 0 && local < BURST + FLOAT;
+      const k = out ? 0.03 : 0.12;
+      d.vx += (d.ox + (out ? d.sdx : 0) - d.x) * k;
+      d.vy += (d.oy + (out ? d.sdy : 0) - d.y) * k;
+      const dx = d.x - mx, dy = d.y - my;
+      const dist = Math.hypot(dx, dy);
+      if (dist < R) {
+        const f = (1 - dist / R) * 1.6;
+        d.vx += (dx / (dist || 1)) * f;
+        d.vy += (dy / (dist || 1)) * f;
+      }
+      d.vx *= out ? 0.86 : 0.74;
+      d.vy *= out ? 0.86 : 0.74;
+      d.x += d.vx;
+      d.y += d.vy;
+      d.a += (1 - d.a) * 0.12;
+      const offd = Math.hypot(d.x - d.ox, d.y - d.oy);
+      tctx.globalAlpha = d.a * Math.max(0.25, 1 - offd / 110);
+      tctx.fillStyle = colorAt(d.ox);
+      tctx.fillRect(d.x, d.y, 1.9, 1.9);
+    }
+    // 删掉的字：粒子轻轻散开并淡出
+    for (let i = dying.length - 1; i >= 0; i--) {
+      const d = dying[i];
+      d.x += d.vx + (Math.random() - 0.5) * 0.8;
+      d.y += d.vy - 0.3;
+      d.a -= 0.06;
+      if (d.a <= 0) {
+        dying.splice(i, 1);
+        continue;
+      }
+      tctx.globalAlpha = d.a;
+      tctx.fillStyle = colorAt(d.ox);
+      tctx.fillRect(d.x, d.y, 1.9, 1.9);
+    }
+    // 光标块：同样是点阵，一闪一闪
+    const lineOut = ct > HOLD && ct < HOLD + BURST + FLOAT + 450;
+    if (!lineOut && Math.floor(t / 530) % 2 === 0) {
+      tctx.globalAlpha = 1;
+      tctx.fillStyle = colorAt(textR);
+      const cx = Math.round(textR + fs * 0.3), cy = Math.round(th / 2 - fs * 0.55);
+      for (let x = 0; x < fs * 0.6; x += TGAP)
+        for (let y = 0; y < fs * 1.1; y += TGAP) tctx.fillRect(cx + x, cy + y, 1.9, 1.9);
+    }
+    tctx.globalAlpha = 1;
+  }
+
+  let lastCycle = -1;
+  function frame(now: number) {
+    requestAnimationFrame(frame);
+    if (!visible) return;
+    const t = Math.max(0, now - start);
+    const cycle = Math.floor(t / CYCLE);
+    const ct = t % CYCLE;
+    // 每一轮换一次散开的方向
+    if (cycle !== lastCycle) {
+      lastCycle = cycle;
+      if (cycle > 0) {
+        dots.forEach(scatterTarget);
+        tdots.forEach(tScatter);
+      }
+    }
+
+    ctx.clearRect(0, 0, w, h);
+    const R = 38; // 鼠标影响半径
+    for (const d of dots) {
+      const local = ct - HOLD - d.delay;
+      const out = local > 0 && local < BURST + FLOAT;
+      const tx = out ? d.sx : d.ox;
+      const ty = out ? d.sy : d.oy;
+      // 散开时弹簧更软、漂浮感更强；回来时更紧
+      const k = out ? 0.018 : 0.05;
+      d.vx += (tx - d.x) * k;
+      d.vy += (ty - d.y) * k;
+      if (out) {
+        d.vx += Math.sin(t / 400 + d.oy * 0.05) * 0.08;
+        d.vy += Math.cos(t / 500 + d.ox * 0.05) * 0.08;
+      }
+      const dx = d.x - mouse.x, dy = d.y - mouse.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < R) {
+        const f = (1 - dist / R) * 2.5;
+        d.vx += (dx / (dist || 1)) * f;
+        d.vy += (dy / (dist || 1)) * f;
+      }
+      d.vx *= 0.84;
+      d.vy *= 0.84;
+      d.x += d.vx;
+      d.y += d.vy;
+    }
+
+    // 颜色：几组和谐的双色渐变，随时间缓慢过渡（每组约 9 秒）
+    const span = w - pad * 2;
+    const pal = palette(t);
+    const s = span < 500 ? 3 : 5;
+    const BANDS = 32;
+    const main: string[] = [], shade: string[] = [];
+    for (let i = 0; i < BANDS; i++) {
+      const c = mix(pal[0], pal[1], i / (BANDS - 1));
+      main.push(rgb(dark ? c : darken(c, 0.62)));
+      shade.push(rgb(darken(c, dark ? 0.28 : 0.3)));
+    }
+    const band = (x: number) => Math.min(BANDS - 1, Math.max(0, (((x - pad) / span) * BANDS) | 0));
+
+    // 偏移层（像贴纸的阴影）
+    for (const d of dots) {
+      const off = Math.hypot(d.x - d.ox, d.y - d.oy);
+      ctx.globalAlpha = Math.max(0, 1 - off / 40);
+      if (ctx.globalAlpha === 0) continue;
+      ctx.fillStyle = shade[band(d.ox)];
+      ctx.fillRect(d.x + s, d.y + s, 3.2, 3.2);
+    }
+    for (const d of dots) {
+      const off = Math.hypot(d.x - d.ox, d.y - d.oy);
+      ctx.globalAlpha = Math.max(0.25, 1 - off / (pad * 1.6));
+      ctx.fillStyle = main[band(d.ox)];
+      const size = off > 6 ? 2.6 : 3.2;
+      ctx.fillRect(d.x, d.y, size, size);
+    }
+    ctx.globalAlpha = 1;
+    drawLine(t, pal, ct);
+  }
+
+  if (!calm) {
+    document.fonts.ready.then(() => {
+      colors();
+      build();
+      buildLine(true);
+      title.classList.add('ghost');
+      line.classList.add('as-particles');
+      requestAnimationFrame(frame);
+    });
+    new MutationObserver(colors).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    // 首屏不可见时暂停绘制，省电
+    new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(canvas.parentElement!);
+    let rt: number;
+    addEventListener('resize', () => {
+      clearTimeout(rt);
+      rt = setTimeout(() => (build(), buildLine(true)), 150);
+    });
+    addEventListener('pointermove', (e) => {
+      const r = canvas.getBoundingClientRect();
+      mouse = { x: e.clientX - r.left, y: e.clientY - r.top };
+      cmx = e.clientX;
+      cmy = e.clientY;
+    });
+    document.addEventListener('pointerleave', () => {
+      mouse = { x: -9999, y: -9999 };
+      cmx = cmy = -9999;
+    });
+  }
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: calc(100vh - 70px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 20px 130px;
+    margin-top: -70px;
+  }
+
+  .glow {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .glow::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    width: 520px;
+    height: 520px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--accent-soft), transparent 65%);
+    opacity: 0.7;
+    animation: breathe 8s ease-in-out infinite;
+    filter: blur(20px);
+  }
+
+  :global(:root.dark) .glow::after {
+    display: none;
+  }
+
+  @keyframes breathe {
+    50% {
+      transform: translate(-50%, -50%) scale(1.15);
+      opacity: 0.45;
+    }
+  }
+
+
+  .title-wrap {
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+
+  .title {
+    margin: 0;
+    font: 800 clamp(84px, 19vw, 230px) / 1 var(--font-display);
+    letter-spacing: -0.05em;
+    color: var(--ink);
+    user-select: none;
+    text-shadow: 6px 6px 0 var(--shadow-hover);
+    transition: opacity 0.6s;
+  }
+
+  .title.ghost {
+    opacity: 0;
+  }
+
+  #hero-canvas {
+    pointer-events: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* 提示符、文字、光标块统一颜色和字体 */
+  .type {
+    margin: 26px 0 0;
+    min-height: 1.6em;
+    font-family: var(--font-mono);
+    font-size: clamp(20px, 2.8vw, 28px);
+    letter-spacing: 0.02em;
+    color: var(--accent);
+    text-align: center;
+  }
+
+  .caret-prompt {
+    margin-right: 8px;
+  }
+
+  .type {
+    position: relative;
+    width: 100%;
+  }
+
+  /* 粒子模式：真实文字保留（给读屏和布局用）但不可见，画面由画布绘制 */
+  .type.as-particles {
+    color: transparent;
+  }
+
+  .type.as-particles .caret {
+    visibility: hidden;
+  }
+
+  #type-canvas {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .caret {
+    display: inline-block;
+    width: 0.6em;
+    height: 1.15em;
+    margin-left: 3px;
+    vertical-align: -0.2em;
+    background: currentColor;
+    animation: blink 1s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+
+</style>

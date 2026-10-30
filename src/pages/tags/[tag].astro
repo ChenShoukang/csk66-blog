@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPosts, slugify, tagCounts } from '../../utils';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return tagCounts(posts).map(([tag]) => ({
+    params: { tag },
+    props: { posts: posts.filter((p) => p.data.tags.some((t) => slugify(t) === tag)) },
+  }));
+}
+
+const { tag } = Astro.params;
+const { posts } = Astro.props;
+---
+
+<Base title={`#${tag}`} description={`标签 ${tag} 下的文章`}>
+  <div class="wrap">
+    <header class="page-head">
+      <a href="/blog" class="kicker"><span class="hl">← 全部文章</span></a>
+      <h1>#{tag}</h1>
+      <p>{posts.length} 篇文章</p>
+    </header>
+    <div class="list">
+      {posts.map((p, i) => <PostCard post={p} index={i} />)}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .list {
+    display: grid;
+    gap: 64px;
+  }
+</style>

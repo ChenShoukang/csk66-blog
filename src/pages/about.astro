@@ -1,0 +1,130 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../config';
+---
+
+<Base title="关于" description={`关于 ${SITE.author}`}>
+  <div class="wrap">
+    <header class="page-head">
+      <div class="kicker">// whoami</div>
+      <h1>关于我<span style="color:var(--accent)">.</span></h1>
+      <p>一点关于我、以及这个博客的介绍。</p>
+    </header>
+
+    <div class="about">
+      <aside class="id-card reveal">
+        <div class="avatar">
+          <span>c</span>
+        </div>
+        <h2>{SITE.author}</h2>
+        <p class="role mono">Learner · Builder</p>
+        {
+          (SITE.location || SITE.email || SITE.github) && (
+            <ul class="mono">
+              {SITE.location && <li>📍 {SITE.location}</li>}
+              {SITE.email && (
+                <li>
+                  ✉️ <a href={`mailto:${SITE.email}`}><span class="hl">{SITE.email}</span></a>
+                </li>
+              )}
+              {SITE.github && (
+                <li>
+                  🐙 <a href={SITE.github} target="_blank" rel="noreferrer"><span class="hl">GitHub</span></a>
+                </li>
+              )}
+            </ul>
+          )
+        }
+      </aside>
+
+      <div class="prose">
+        <h2 id="hi">你好 👋</h2>
+        <p>我是 <strong>{SITE.author}</strong>，欢迎来到我的博客。</p>
+        <p>这里会记录我学到的东西、做过的项目，以及一些生活里的想法。写下来，既是给自己的笔记，也希望对你有一点帮助。</p>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .about {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+
+  .id-card {
+    position: sticky;
+    top: 110px;
+    padding: 28px 24px;
+    border: 2px solid var(--border);
+    border-radius: 18px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .avatar {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 16px;
+    display: grid;
+    place-items: center;
+    border-radius: 30px;
+    border: 2px solid var(--border);
+    background: repeating-linear-gradient(-45deg, var(--accent) 0 8px, var(--accent-soft) 8px 16px);
+    transform: rotate(-4deg);
+    transition: transform 0.4s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+
+  .avatar:hover {
+    transform: rotate(4deg) scale(1.04);
+  }
+
+  .avatar span {
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    border-radius: 20px;
+    background: var(--ink);
+    color: var(--paper);
+    font: 700 48px var(--font-mono);
+  }
+
+  .id-card h2 {
+    margin: 0;
+    font: 800 30px var(--font-display);
+  }
+
+  .role {
+    margin: 2px 0 0;
+    color: var(--accent);
+    font-size: 13px;
+  }
+
+  .id-card ul {
+    list-style: none;
+    padding: 16px 0 0;
+    margin: 16px 0 0;
+    display: grid;
+    gap: 6px;
+    font-size: 13.5px;
+    text-align: left;
+    border-top: 1.5px dashed var(--line);
+  }
+
+  .prose > h2:first-child {
+    margin-top: 0;
+  }
+
+  @media (max-width: 860px) {
+    .about {
+      grid-template-columns: 1fr;
+    }
+    .id-card {
+      position: static;
+    }
+  }
+</style>

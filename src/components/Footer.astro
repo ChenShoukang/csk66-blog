@@ -1,0 +1,149 @@
+---
+import { SITE, NAV } from '../config';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="grid">
+      <div class="brand">
+        <a href="/" class="name">{SITE.name}<span>.</span></a>
+        <p class="desc">{SITE.description}</p>
+        <ul class="meta mono">
+          {SITE.location && <li>📍 {SITE.location}</li>}
+          <li>🕒 <span id="local-time">--:--</span></li>
+          {SITE.now && <li>🎧 {SITE.now}</li>}
+        </ul>
+      </div>
+      <div class="col">
+        <h4>站点导航</h4>
+        {NAV.map((n) => <a href={n.href}><span class="hl">{n.label}</span></a>)}
+      </div>
+      <div class="col">
+        <h4>其他</h4>
+        <a href="/rss.xml" type="application/rss+xml"><span class="hl">RSS</span></a>
+        {SITE.github && <a href={SITE.github} target="_blank" rel="noreferrer"><span class="hl">GitHub ↗</span></a>}
+        {SITE.email && <a href={`mailto:${SITE.email}`}><span class="hl">邮箱</span></a>}
+      </div>
+    </div>
+    <div class="bottom mono">
+      <span>© {year} {SITE.author} · 用心写，慢慢来</span>
+      <a href="#" class="top" aria-label="Back to top">↑ 回到顶部</a>
+    </div>
+  </div>
+  <div class="giant" aria-hidden="true">{SITE.name}</div>
+</footer>
+
+<script define:vars={{ tz: SITE.timezone }}>
+  const el = document.getElementById('local-time');
+  const tick = () => {
+    const now = new Date();
+    el.textContent = now.toLocaleTimeString('zh-CN', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false });
+  };
+  tick();
+  setInterval(tick, 30000);
+</script>
+
+<style>
+  .site-footer {
+    position: relative;
+    margin-top: 120px;
+    overflow: hidden;
+    border-top: 2px solid var(--border);
+    background: var(--paper-2);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+    padding: 48px 0 32px;
+  }
+
+  .name {
+    font: 700 28px var(--font-display);
+    letter-spacing: -0.03em;
+  }
+
+  .name span {
+    color: var(--accent);
+  }
+
+  .desc {
+    color: var(--ink-2);
+    margin: 8px 0 18px;
+    max-width: 380px;
+  }
+
+  .meta {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--ink-2);
+    display: grid;
+    gap: 4px;
+  }
+
+  .meta em {
+    color: var(--muted);
+    font-style: normal;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .col h4 {
+    margin: 0 0 6px;
+    font: 600 12px var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+  }
+
+  .col a {
+    width: fit-content;
+  }
+
+  .bottom {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    padding: 18px 0 28px;
+    border-top: 1.5px dashed var(--line);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .top:hover {
+    color: var(--accent);
+  }
+
+  .giant {
+    position: absolute;
+    left: 50%;
+    bottom: -0.32em;
+    transform: translateX(-50%);
+    font: 800 clamp(120px, 26vw, 340px) var(--font-display);
+    letter-spacing: -0.06em;
+    line-height: 1;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1.5px color-mix(in srgb, var(--ink) 12%, transparent);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  @media (max-width: 760px) {
+    .grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .brand {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
