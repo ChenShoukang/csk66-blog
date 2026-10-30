@@ -25,11 +25,11 @@ EdgeOne CLI 装在 **D 盘**（不占 C 盘）：`D:\aiwork\tools\node_modules\.
 
 ```powershell
 # 首次登录（在项目根目录 csk66 下运行；凭据存到项目的 .edgeone\，不会写到 C 盘）
-D:\aiwork\tools\node_modules\.bin\edgeone.cmd login --site china --local
+powershell -ExecutionPolicy Bypass -File D:\aiwork\tools\edgeone.ps1 login --site china --local
 
 # 发布
 npm run build
-D:\aiwork\tools\node_modules\.bin\edgeone.cmd makers deploy dist -n 001 -e production
+powershell -ExecutionPolicy Bypass -File D:\aiwork\tools\edgeone.ps1 makers deploy dist -n 001 -e production
 ```
 
 也可以不登录，直接带 API Token：
