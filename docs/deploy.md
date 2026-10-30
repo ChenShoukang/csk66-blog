@@ -24,7 +24,7 @@
 EdgeOne CLI 装在 **D 盘**（不占 C 盘）：`D:\aiwork\tools\node_modules\.bin\edgeone.cmd`
 
 ```powershell
-# 首次登录（凭据会存到当前目录的 .edgeone\，不会写到 C 盘）
+# 首次登录（在项目根目录 csk66 下运行；凭据存到项目的 .edgeone\，不会写到 C 盘）
 D:\aiwork\tools\node_modules\.bin\edgeone.cmd login --site china --local
 
 # 发布
