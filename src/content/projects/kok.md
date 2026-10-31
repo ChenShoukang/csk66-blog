@@ -3,12 +3,18 @@ title: kok
 desc: 本地媒体与知识仓库：视频、照片、音乐、文档和电子书统一收纳，用空间组织主题、用摘录连接原文与笔记，需要时再让 AI 帮忙。
 tech: ['WebView2', 'JavaScript', 'Node.js', 'SQLite', 'PowerShell']
 year: 2026
-link: https://github.com/ChenShoukang/kok/releases/latest
+link: https://github.com/ChenShoukang/kok/releases/tag/v0.9.0
 repo: https://github.com/ChenShoukang/kok
 draft: false
 ---
 
 kok 是一个**本地优先**的媒体与知识仓库：把视频、照片、音乐、文档和电子书收进同一个资料库，用「空间」组织主题，用摘录把原文和笔记连起来，需要时再让 AI 帮忙翻译、整理和写作。
+
+## v0.9.0 更新
+
+- **索引与检索**：内容索引可随资料更新；本机 Ollama 语义 + FTS5 混合检索，支持 PDF / 正文 / 字幕 / 摘录的来源片段。
+- **采集与迁移**：浏览器采集（网页、选区、图片收件箱）、Windows OCR；Markdown / JSON 便携导出、校验恢复与新库重连。
+- **Agent 与 MCP**：限定范围的只读 MCP；Agent 增加版本化事件、中断后保留正文、审批策略与精确计算。
 
 ## 能做什么
 
@@ -23,4 +29,4 @@ kok 是一个**本地优先**的媒体与知识仓库：把视频、照片、音
 - 索引、笔记和历史存在本地 SQLite；收录不搬动原件，移除记录也不会删除原文件。
 - 纯净模式可以完全离线使用；智能模式才启用 AI 能力，也可以接 DeepSeek、Ollama、LM Studio 等兼容接口。
 
-当前版本仍在开发中，公开下载的是最新的 Preview 预览版。
+当前公开下载的是 **v0.9.0 Preview**（未签名预览版）：[下载安装包](https://github.com/ChenShoukang/kok/releases/tag/v0.9.0)。
