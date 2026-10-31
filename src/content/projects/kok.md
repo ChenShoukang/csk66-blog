@@ -3,18 +3,26 @@ title: kok
 desc: 本地媒体与知识仓库：视频、照片、音乐、文档和电子书统一收纳，用空间组织主题、用摘录连接原文与笔记，需要时再让 AI 帮忙。
 tech: ['WebView2', 'JavaScript', 'Node.js', 'SQLite', 'PowerShell']
 year: 2026
-link: https://github.com/ChenShoukang/kok/releases/tag/v0.9.0
+link: https://github.com/ChenShoukang/kok/releases/tag/v0.9.3
 repo: https://github.com/ChenShoukang/kok
 draft: false
 ---
 
 kok 是一个**本地优先**的媒体与知识仓库：把视频、照片、音乐、文档和电子书收进同一个资料库，用「空间」组织主题，用摘录把原文和笔记连起来，需要时再让 AI 帮忙翻译、整理和写作。
 
-## v0.9.0 更新
+## v0.9.3 更新
 
-- **索引与检索**：内容索引可随资料更新；本机 Ollama 语义 + FTS5 混合检索，支持 PDF / 正文 / 字幕 / 摘录的来源片段。
-- **采集与迁移**：浏览器采集（网页、选区、图片收件箱）、Windows OCR；Markdown / JSON 便携导出、校验恢复与新库重连。
-- **Agent 与 MCP**：限定范围的只读 MCP；Agent 增加版本化事件、中断后保留正文、审批策略与精确计算。
+- **本地 MCP 沙箱**：每个 stdio 服务可指定用户可写的便携运行时目录并启用 AppContainer；主程序只授予只读执行 ACL，系统目录或不可授权目录明确拒绝、不静默降级。
+- **MCP OAuth 设备码**（RFC 8628）：支持 user code / 验证地址、authorization_pending、slow_down、过期与拒绝处理，令牌用 DPAPI 加密并支持 refresh。
+- **PDF / 视频批量索引**：审批后才能执行的 `index_pdf_pages`（PDFium 文本层，最多 25 页）与 `index_video_frames`（FFmpeg + Windows OCR，最多 12 帧）合并进本地内容索引；不调用模型、不改原文件。
+
+## 最近几版（0.9.1 – 0.9.2）
+
+- **Agent 视觉与联网**：`read_image` 支持 PDF 页码和视频时间点；`fetch_url` / `web_search` 逐次审批，正文提取带 HTTPS / 内网 / 大小限制。
+- **远程 MCP**：Streamable HTTP，OAuth 授权码 + PKCE、动态客户端注册、refresh token，令牌 DPAPI 加密。
+- **受控执行环境**：可选工作目录内的读写与命令执行，默认关闭、逐次审批，带路径穿越 / 超时 / 输出限制。
+- **长任务与记忆**：24 轮 / 请求、128k 上下文档位、定时计划任务；本机 embedding 语义召回与近似记忆合并。
+- **并行编排**：`delegate_parallel` 可启动 2–3 个只读子代理，共享父预算，结果汇总后仍需父任务核对。
 
 ## 能做什么
 
@@ -29,4 +37,4 @@ kok 是一个**本地优先**的媒体与知识仓库：把视频、照片、音
 - 索引、笔记和历史存在本地 SQLite；收录不搬动原件，移除记录也不会删除原文件。
 - 纯净模式可以完全离线使用；智能模式才启用 AI 能力，也可以接 DeepSeek、Ollama、LM Studio 等兼容接口。
 
-当前公开下载的是 **v0.9.0 Preview**（未签名预览版）：[下载安装包](https://github.com/ChenShoukang/kok/releases/tag/v0.9.0)。
+当前公开下载的是 **v0.9.3 Preview**（未签名预览版）：[下载安装包](https://github.com/ChenShoukang/kok/releases/tag/v0.9.3)。
