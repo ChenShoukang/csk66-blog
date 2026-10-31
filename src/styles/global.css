@@ -1,4 +1,5 @@
 @import '@fontsource-variable/space-grotesk';
+@import '@fontsource-variable/noto-sans-sc';
 @import '@fontsource-variable/jetbrains-mono';
 
 /* ============ 设计令牌 ============ */
@@ -19,8 +20,8 @@
   --shadow-hover: var(--accent);
   --shadow: 6px 6px 0 var(--shadow-c);
 
-  --font-display: 'Space Grotesk Variable', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-body: 'Space Grotesk Variable', -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-display: 'Space Grotesk Variable', 'Noto Sans SC Variable', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-body: 'Space Grotesk Variable', 'Noto Sans SC Variable', -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, Consolas, monospace;
 
   --wrap: 1080px;
