@@ -60,6 +60,22 @@ npm run dev
 
 `src/config.ts` 里留空的字段（比如邮箱、地点）不会显示在页面上。
 
+## 同步 kok 帮助中心
+
+`/docs/kok/` 是 kok 仓库 `docs/help/` 帮助中心在博客上的镜像，由脚本生成，避免两边手写两份：
+
+```bash
+# 在博客仓库根目录，默认读取 ../kok/docs/help
+npm run sync:kok-help
+# 或指定 kok 帮助目录
+node scripts/sync-kok-help.mjs ../kok/docs/help
+```
+
+脚本会抽取标题写 frontmatter、去掉一级标题、把帮助页之间的链接改成 `/docs/kok/.../`、
+把指向 kok 仓库现有文档的链接改成 GitHub 链接、复制截图，并生成侧栏目录 `src/data/kok-docs.ts`。
+同步后在本地 `npm run dev` 预览，确认无误再提交。Obsidian callout（`> [!tip]` 等）由
+`src/plugins/remark-callouts.mjs` 在构建时转成带样式的提示框。
+
 ## 部署
 
 站点是纯静态的，代码在 GitHub：<https://github.com/ChenShoukang/csk66-blog>

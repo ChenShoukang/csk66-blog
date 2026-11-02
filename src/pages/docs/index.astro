@@ -1,0 +1,107 @@
+---
+import Base from '../../layouts/Base.astro';
+import { KOK_DOCS } from '../../data/kok-docs';
+---
+
+<Base title="文档" description="kok 的完整帮助中心与产品介绍。">
+  <div class="wrap">
+    <header class="page-head">
+      <div class="kicker">// docs</div>
+      <h1>文档<span style="color:var(--accent)">.</span></h1>
+      <p>项目手册、帮助中心与长期维护的说明文档。</p>
+    </header>
+
+    <div class="grid">
+      <a class="doc-card" href="/docs/kok/">
+        <div class="doc-top mono">
+          <span>kok</span>
+          <span>{KOK_DOCS.reduce((total, section) => total + section.pages.length, 0) + 1} 页</span>
+        </div>
+        <h2>kok 帮助中心</h2>
+        <p>本地优先的个人 AI Agent 工作台：安装、三个区域（Agent / 我的作品 / 资料库）、设置与参考。</p>
+        <div class="doc-groups mono">
+          {KOK_DOCS.map((section) => (
+            <span>{section.title}</span>
+          ))}
+        </div>
+        <div class="more mono">打开帮助中心 <span class="go">→</span></div>
+      </a>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 28px;
+  }
+
+  .doc-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: 5px 5px 0 var(--shadow-c);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .doc-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 var(--shadow-hover);
+  }
+
+  .doc-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .doc-card h2 {
+    margin: 0;
+    font: 700 24px var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  .doc-card p {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .doc-groups {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .doc-groups span {
+    padding: 1px 8px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+  }
+
+  .more {
+    margin-top: auto;
+    padding-top: 8px;
+    color: var(--accent);
+    font-size: 13px;
+  }
+
+  .more .go {
+    display: inline-block;
+    transition: transform 0.25s;
+  }
+
+  .doc-card:hover .go {
+    transform: translateX(4px);
+  }
+</style>

@@ -47,4 +47,14 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { blog, works, projects };
+// 由 scripts/sync-kok-help.mjs 从 kok 仓库同步的文档（目前只有 kok 帮助中心）。
+const docs = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/docs' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { blog, works, projects, docs };

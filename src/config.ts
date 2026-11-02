@@ -18,6 +18,7 @@ export const SITE = {
 export const NAV = [
   { href: '/blog', label: '博客' },
   { href: '/projects', label: '项目' },
+  { href: '/docs', label: '文档' },
   { href: '/works', label: '作品' },
   { href: '/about', label: '关于' },
 ];

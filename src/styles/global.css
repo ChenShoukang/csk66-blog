@@ -409,3 +409,63 @@ button:hover .hl {
 .empty-state p {
   margin: 10px 0 0;
 }
+
+/* ============ 文档区（kok 帮助中心） ============ */
+/* 由 remark-callouts 插件生成：> [!tip] 等 Obsidian callout 转成 aside */
+.prose .callout {
+  --callout-tint: var(--accent-soft);
+  --callout-line: var(--accent);
+  margin: 1.5em 0;
+  padding: 14px 18px;
+  border: 2px solid var(--border);
+  border-left: 5px solid var(--callout-line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--callout-tint) 45%, var(--card));
+  box-shadow: 3px 3px 0 var(--shadow-c);
+  color: var(--ink-2);
+}
+
+.prose .callout-tip {
+  --callout-tint: #d8f0d8;
+  --callout-line: #2f9e44;
+}
+
+.prose .callout-info {
+  --callout-tint: var(--accent-soft);
+  --callout-line: var(--accent);
+}
+
+.prose .callout-warning {
+  --callout-tint: #ffe3cf;
+  --callout-line: #e8590c;
+}
+
+.prose .callout-example {
+  --callout-tint: #e9defb;
+  --callout-line: #7048e8;
+}
+
+:root.dark .prose .callout {
+  background: color-mix(in srgb, var(--callout-line) 12%, var(--card));
+}
+
+.prose .callout-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 4px;
+  font: 700 0.98em var(--font-display);
+  color: var(--ink);
+}
+
+.prose .callout-body > * {
+  margin-top: 0;
+}
+
+.prose .callout-body > * + * {
+  margin-top: 0.7em;
+}
+
+.prose .callout-body a {
+  border-bottom-color: var(--callout-line);
+}

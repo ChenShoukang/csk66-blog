@@ -172,7 +172,7 @@
       ? shown
           .map(
             (it, i) =>
-              `<li class="${i === sel ? 'sel' : ''}"><a href="${it.url}"><span class="t">${esc(it.title)}</span><span class="k">${it.type} · ${it.date}</span></a></li>`,
+              `<li class="${i === sel ? 'sel' : ''}"><a href="${it.url}"><span class="t">${esc(it.title)}</span><span class="k">${it.type}${it.date ? ` · ${it.date}` : ''}</span></a></li>`,
           )
           .join('')
       : `<li class="empty">${!items?.length ? '还没有可以搜索的内容' : q ? `没有找到 “${esc(q)}”` : '输入关键词开始搜索'}</li>`;

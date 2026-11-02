@@ -32,8 +32,13 @@ const { title, desc, tech, year, link, repo, cover } = entry.data;
         )
       }
       {
-        (link || repo) && (
+        (link || repo || entry.id === 'kok') && (
           <div class="ext">
+            {entry.id === 'kok' && (
+              <a class="btn sub docs-btn" href="/docs/kok/">
+                帮助中心 →
+              </a>
+            )}
             {repo && (
               <a class="btn gh" href={repo} target="_blank" rel="noreferrer">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
