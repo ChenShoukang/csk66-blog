@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "sync:kok-help": "node scripts/sync-kok-help.mjs ../kok/docs/help"
+    "sync:kok-help": "node scripts/sync-kok-help.mjs ../../code/kok/docs/help"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
