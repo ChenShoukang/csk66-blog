@@ -1,58 +1,46 @@
 ---
 title: "kok 帮助中心"
-description: "kok 是一个本地优先的个人 AI Agent 工作台：把视频、照片、音乐、文档和电子书收进本机资料库， 需要时交给 Agent 整理、阅读、写作和制作可继续编辑的成果；不需要 AI 时，也可以只把它当作播放器、 阅读器和资料管理器使用。"
+description: "kok 是一个本地优先的工作台。你可以读、看、听电脑里的资料，做一份文档或演示，也可以请 Agent 根据选定的资料协助创作。"
 ---
-kok 是一个**本地优先的个人 AI Agent 工作台**：把视频、照片、音乐、文档和电子书收进本机资料库，
-需要时交给 Agent 整理、阅读、写作和制作可继续编辑的成果；不需要 AI 时，也可以只把它当作播放器、
-阅读器和资料管理器使用。
+kok 是一个本地优先的工作台。你可以读、看、听电脑里的资料，做一份文档或演示，也可以请 Agent 根据选定的资料协助创作。
 
-> [!info]+ 这份帮助说明的是 v0.10.1 Preview
-> 可见入口会随使用模式、模块开关和文件格式变化。本版把一级入口按使用场景组织为 **Agent**、
-> **我的作品** 和 **资料库**；小说章节/设定管理与从零生成音视频仍分阶段接入，详见[能力边界](/docs/kok/reference/boundaries/)。
+[入门](#由此开始) · [Agent](#agent) · [我的作品](#我的作品) · [资料库](#资料库) · [设置](#设置) · [常见问题](/docs/kok/reference/faq/)
 
-![kok 我的作品页面，使用内置原创示例](/docs/kok/works-zh.png)
+这份帮助适用于 **v0.11.2 Preview**。下载、系统要求和更新方式见[安装 kok](/docs/kok/getting-started/install/)。
 
-## 从这里开始
 
-| 想做的事 | 从这里开始 |
-| --- | --- |
-| 第一次安装并打开 kok | [安装 kok](/docs/kok/getting-started/install/) |
-| 决定用纯净模式还是智能模式 | [选择使用模式](/docs/kok/getting-started/modes/) |
-| 把文件放进资料库 | [导入第一份资料](/docs/kok/getting-started/import/) |
-| 先认识界面 | [认识界面](/docs/kok/getting-started/interface/) |
+## 由此开始
+
+1. [下载并运行 kok](/docs/kok/getting-started/install/)。
+2. [读一份资料，写下第一篇笔记](/docs/kok/getting-started/first-work/)。可以使用随包附带的示例，无需配置 AI。
+3. [用资料做一份报告和 PPT](/docs/kok/getting-started/first-agent-project/)。这条教程会带你配置 AI、检查来源、确认修改、继续改稿和导出。
 
 ## 三个工作区域
 
-kok 的一级入口按“你要做什么”组织，而不是按文件类型组织。文件类型和工具留在各自区域内部。
+- **Agent** 帮你查找资料、整理内容和提出改稿方案。[认识 Agent](/docs/kok/agent/)
+- **我的作品** 用来新建或继续编辑，相关的资料、要求和成果可以放进同一个创作项目。[认识我的作品](/docs/kok/works/)
+- **资料库** 用来播放、阅读、收藏和查找本地文件。[认识资料库](/docs/kok/library/)
 
-| 区域 | 适合做什么 | 进入后从哪开始 |
-| --- | --- | --- |
-| **Agent** | 说出目标，让 Agent 规划、检索、整理、写作、制作可审核的成果 | [Agent 概览](/docs/kok/agent/) |
-| **我的作品** | 新建文档或演示文稿，继续编辑草稿，组织项目空间、摘录和配方 | [我的作品概览](/docs/kok/works/) |
-| **资料库** | 看视频、听音乐、阅读文档和电子书、浏览照片，管理进度与收藏 | [资料库概览](/docs/kok/library/) |
+## 按任务查找
 
-> [!tip]- 一个区域，一条完整路径
-> 想看电影：从**资料库**直接播放。想写点东西：在**我的作品**新建文档。想请 Agent 帮你处理资料：
-> 在 **Agent** 里添加资料并说出要求。三条路径互不冲突，资料也可以在创作时按需引用。
-
-## 常用任务
-
-- 给 Agent 一个范围清楚的任务：[发起一个 Agent 任务](/docs/kok/agent/start-task/)
-- 审查 Agent 提出的修改：[审查与撤销修改](/docs/kok/agent/review-changes/)
-- 新建并编辑文档：[新建与编辑文档](/docs/kok/works/create-documents/)
-- 把已有视频或音频剪成新内容：[剪辑已有音视频与整理 PDF](/docs/kok/works/edit-media/)
-- 接着上次的位置看或读：[继续、收藏、最近与分类](/docs/kok/library/continue-favorites/)
-- 把看过的内容留下来：[保存摘录](/docs/kok/library/clips/)
-- 把重复步骤存成配方：[项目空间、素材摘录与配方](/docs/kok/works/projects-clips-recipes/)
-- 配置自己的 AI 服务：[配置 AI 服务](/docs/kok/settings/ai-service/)
-
-找不到入口时，可以先读[认识 kok](/docs/kok/about-kok/)了解整体设计，再按下面的完整目录查找。
+| 你想做什么 | 操作说明 |
+| --- | --- |
+| 新建 PPT、双击改字或拖动换页 | [制作与编辑演示文稿](/docs/kok/works/presentations/) |
+| 改报告中的一段，或找回旧稿 | [编辑、对比与恢复文档](/docs/kok/works/create-documents/) |
+| 过几天继续做同一件作品 | [继续创作项目](/docs/kok/works/continue-editing/) |
+| 查找较早的项目和导出的副本 | [项目搜索与交付记录](/docs/kok/works/continue-editing/#项目搜索与交付记录) |
+| 核对 Agent 的来源和修改 | [审查与撤销修改](/docs/kok/agent/review-changes/) |
+| Agent 停在一半或提示回答未完成 | [找回结果与继续任务](/docs/kok/agent/results-history/) |
+| 找回看到一半的视频或书 | [继续、收藏与最近打开](/docs/kok/library/continue-favorites/) |
+| 换电脑或升级，保留资料和笔记 | [数据、备份与更新](/docs/kok/settings/data-backup/) |
 
 ## 完整目录
 
 ### 开始使用
 
 - [安装 kok](/docs/kok/getting-started/install/)
+- [读一份资料，写下第一篇笔记](/docs/kok/getting-started/first-work/)
+- [用资料做一份报告和 PPT](/docs/kok/getting-started/first-agent-project/)
 - [选择使用模式](/docs/kok/getting-started/modes/)
 - [导入第一份资料](/docs/kok/getting-started/import/)
 - [认识界面](/docs/kok/getting-started/interface/)
@@ -62,7 +50,7 @@ kok 的一级入口按“你要做什么”组织，而不是按文件类型组�
 - [Agent 概览](/docs/kok/agent/)
 - [发起一个 Agent 任务](/docs/kok/agent/start-task/)
 - [审查与撤销修改](/docs/kok/agent/review-changes/)
-- [成果、任务记录与会话](/docs/kok/agent/results-history/)
+- [找回结果与继续任务](/docs/kok/agent/results-history/)
 - [长期记忆与计划任务](/docs/kok/agent/memory-schedules/)
 - [外部工具 MCP](/docs/kok/agent/mcp/)
 - [技能、用量与费用](/docs/kok/agent/skills-budget/)
@@ -71,8 +59,8 @@ kok 的一级入口按“你要做什么”组织，而不是按文件类型组�
 
 - [我的作品概览](/docs/kok/works/)
 - [新建与编辑文档](/docs/kok/works/create-documents/)
-- [制作演示文稿](/docs/kok/works/presentations/)
-- [继续创作与草稿](/docs/kok/works/continue-editing/)
+- [制作与编辑演示文稿](/docs/kok/works/presentations/)
+- [继续创作项目与草稿](/docs/kok/works/continue-editing/)
 - [项目空间、素材摘录与配方](/docs/kok/works/projects-clips-recipes/)
 - [剪辑已有音视频与整理 PDF](/docs/kok/works/edit-media/)
 
@@ -117,10 +105,6 @@ kok 的一级入口按“你要做什么”组织，而不是按文件类型组�
 - [认识 kok](/docs/kok/about-kok/)
 - [帮助与支持](/docs/kok/help-and-support/)
 
----
+## 反馈与贡献
 
-**相关**
-
-- [认识 kok：它解决什么问题，不做什么](/docs/kok/about-kok/)
-- [帮助与支持：反馈、文档与许可](/docs/kok/help-and-support/)
-- [当前用户指南](https://github.com/ChenShoukang/kok/blob/main/docs/GUIDE.md) · [功能结构](https://github.com/ChenShoukang/kok/blob/main/docs/CREATION_PRODUCT_FLOW.md) · [文档目录](https://github.com/ChenShoukang/kok/blob/main/docs/README.md)
+遇到问题时，请附上版本和复现步骤。开发文档、验证记录和历史说明集中在文档目录。[帮助与支持](/docs/kok/help-and-support/) · [文档目录](https://github.com/ChenShoukang/kok/blob/main/docs/README.md) · [贡献说明](https://github.com/ChenShoukang/kok/blob/main/CONTRIBUTING.md)

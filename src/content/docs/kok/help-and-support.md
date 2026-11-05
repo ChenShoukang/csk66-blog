@@ -34,7 +34,7 @@ description: "遇到问题时，先按下面的顺序自查；如果仍然无法
 | 模式、私密文件夹与数据边界 | [模式与隐私](https://github.com/ChenShoukang/kok/blob/main/docs/MODES.md) |
 | AI 服务配置与兼容性 | [AI 服务配置](https://github.com/ChenShoukang/kok/blob/main/docs/AI_PROVIDERS.md) |
 | Agent 能力边界与审核 | [Agent 能力](https://github.com/ChenShoukang/kok/blob/main/docs/AGENT_0.9.3.md) · [审核交互](https://github.com/ChenShoukang/kok/blob/main/docs/AGENT_INTERACTIONS.md) |
-| 本版验证记录 | [v0.10.1 验证](https://github.com/ChenShoukang/kok/blob/main/docs/VALIDATION_0.10.1.md) |
+| 本版验证记录 | [v0.11.2 验证](https://github.com/ChenShoukang/kok/blob/main/docs/VALIDATION_0.11.2.md) |
 | 版本变化 | [更新记录](https://github.com/ChenShoukang/kok/blob/main/CHANGELOG.md) |
 
 ## 许可与致谢

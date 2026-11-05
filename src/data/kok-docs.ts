@@ -18,6 +18,14 @@ export const KOK_DOCS: KokDocSection[] = [
         "href": "/docs/kok/getting-started/install/"
       },
       {
+        "label": "读一份资料，写下第一篇笔记",
+        "href": "/docs/kok/getting-started/first-work/"
+      },
+      {
+        "label": "用资料做一份报告和 PPT",
+        "href": "/docs/kok/getting-started/first-agent-project/"
+      },
+      {
         "label": "选择使用模式",
         "href": "/docs/kok/getting-started/modes/"
       },
@@ -47,7 +55,7 @@ export const KOK_DOCS: KokDocSection[] = [
         "href": "/docs/kok/agent/review-changes/"
       },
       {
-        "label": "成果、任务记录与会话",
+        "label": "找回结果与继续任务",
         "href": "/docs/kok/agent/results-history/"
       },
       {
@@ -76,11 +84,11 @@ export const KOK_DOCS: KokDocSection[] = [
         "href": "/docs/kok/works/create-documents/"
       },
       {
-        "label": "制作演示文稿",
+        "label": "制作与编辑演示文稿",
         "href": "/docs/kok/works/presentations/"
       },
       {
-        "label": "继续创作与草稿",
+        "label": "继续创作项目与草稿",
         "href": "/docs/kok/works/continue-editing/"
       },
       {
@@ -241,6 +249,14 @@ export const KOK_DOC_FLAT: KokDocLink[] = [
     "href": "/docs/kok/getting-started/install/"
   },
   {
+    "label": "读一份资料，写下第一篇笔记",
+    "href": "/docs/kok/getting-started/first-work/"
+  },
+  {
+    "label": "用资料做一份报告和 PPT",
+    "href": "/docs/kok/getting-started/first-agent-project/"
+  },
+  {
     "label": "选择使用模式",
     "href": "/docs/kok/getting-started/modes/"
   },
@@ -265,7 +281,7 @@ export const KOK_DOC_FLAT: KokDocLink[] = [
     "href": "/docs/kok/agent/review-changes/"
   },
   {
-    "label": "成果、任务记录与会话",
+    "label": "找回结果与继续任务",
     "href": "/docs/kok/agent/results-history/"
   },
   {
@@ -289,11 +305,11 @@ export const KOK_DOC_FLAT: KokDocLink[] = [
     "href": "/docs/kok/works/create-documents/"
   },
   {
-    "label": "制作演示文稿",
+    "label": "制作与编辑演示文稿",
     "href": "/docs/kok/works/presentations/"
   },
   {
-    "label": "继续创作与草稿",
+    "label": "继续创作项目与草稿",
     "href": "/docs/kok/works/continue-editing/"
   },
   {
